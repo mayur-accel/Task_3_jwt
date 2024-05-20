@@ -26,13 +26,13 @@ export const authMiddleware = async (
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, secretKey) as JwtPayload;
+    jwt.verify(token, secretKey) as JwtPayload;
 
     // You can add additional checks on the decoded payload if needed
     // For example, checking user roles or permissions
 
     // Attach the decoded payload to the request object for further use
-    req.body = decoded;
+    // req.body = decoded;
 
     next();
   } catch (err) {
