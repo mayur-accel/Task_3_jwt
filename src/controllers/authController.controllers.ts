@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { UserRoleEnum } from "../constant/constant";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { AppError } from "../middleware/errorHandler.middleware";
+import { UserLogs } from "../models/history.model";
 import User from "../models/user.models";
 import { generateJWTToken } from "../utils/jwtToken";
 
@@ -30,9 +32,22 @@ export const authLoginController = async (req: Request, res: Response) => {
     firstName: userData.firstName,
     lastName: userData.lastName,
     email: userData.email,
+    userRole: userData.userRole || UserRoleEnum.free,
   };
 
   const jwtToken = await generateJWTToken(passUserData);
+
+  const currentTime = new Date();
+  const data = new UserLogs({
+    userId: userData._id,
+    isActive: true,
+    lastActiveTime: currentTime,
+    loginTime: currentTime,
+    logoutTime: "",
+    token: jwtToken,
+  });
+
+  data.save();
 
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
@@ -225,9 +240,29 @@ export const authForgotPasswordController = async (
   });
 };
 
-export const authLogoutController = (req: Request, res: Response) => {
+export const authLogoutController = async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.split(" ")[1];
+  const user: any = req.user;
+
+  if (!user) {
+    return res.status(HTTPStatusCode.Ok).json({
+      status: HTTPStatusCode.Ok,
+      message: "User logout sucessfull",
+    });
+  }
+
+  await UserLogs.findOneAndUpdate(
+    {
+      userId: user.id,
+      token: token,
+    },
+    {
+      lastActiveTime: new Date(),
+      logoutTime: new Date(),
+      isActive: false,
+    }
+  );
 
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,

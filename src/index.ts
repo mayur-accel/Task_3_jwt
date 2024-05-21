@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import session from "express-session";
 import passport from "passport";
 import { connectDatabase } from "./db/dbConnection";
+import { apiLogMiddleware } from "./middleware/apiLog.middleware";
 import { errorHandler } from "./middleware/errorHandler.middleware";
 import "./middleware/googleAuth.middleware";
 import RootRouter from "./routes/rootRouter.routes";
@@ -25,6 +26,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(apiLogMiddleware);
 
 app.use("/api/v1", RootRouter);
 
@@ -40,6 +42,7 @@ app.get(
     failureRedirect: "/auth/google/failure",
   })
 );
+
 app.get("/auth/logout", async (req: Request, res: Response) => {
   req.logout((err) => {
     if (err) console.log(err);

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Schema } from "mongoose";
+import { UserRoleEnum } from "../constant/constant";
 
 const userSchema = new Schema(
   {
@@ -24,6 +25,11 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    userRole: {
+      type: Number,
+      default: UserRoleEnum.free,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -32,7 +38,6 @@ const userSchema = new Schema(
 
 // Hash password before saving the user model
 userSchema.pre("save", async function (next) {
-  console.log(this.isModified("password"), "dsadsa");
   if (this.isModified("password") || this.isNew) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);

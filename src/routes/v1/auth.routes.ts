@@ -26,6 +26,10 @@ AuthRouter.post(
 
 AuthRouter.post("/forgot-password", asyncWrapper(authForgotPasswordController));
 
-AuthRouter.post("/logout", asyncWrapper(authLogoutController));
+AuthRouter.post(
+  "/logout",
+  asyncWrapper(authMiddleware),
+  asyncWrapper(authLogoutController)
+);
 
 export default AuthRouter;
