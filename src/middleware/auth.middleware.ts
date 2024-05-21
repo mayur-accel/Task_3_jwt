@@ -54,9 +54,7 @@ export const authMiddleware = async (
           )
         );
       }
-    }
-
-    if (normalURL.includes(req.url)) {
+    } else if (normalURL.includes(req.url)) {
       if (decoded.userRole === UserRoleEnum.free) {
         next(
           new AppError(
