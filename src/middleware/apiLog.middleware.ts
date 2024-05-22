@@ -46,9 +46,7 @@ export const apiLogMiddleware = (
         colors.FgBlue
       }${req.method}${colors.Reset} ${req.path} ${statusCodeColor}${
         res.statusCode
-      }${colors.Reset} ${duration}ms - ${colors.FgWhite}${
-        req.headers.authorization
-      }${colors.Reset}`
+      }${colors.Reset} ${duration}ms - ${colors.FgWhite}${colors.Reset}`
     );
   });
   next();

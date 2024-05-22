@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { UserRoleEnum, normalURL, proURL } from "../constant/constant";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { UserLogs } from "../models/history.model";
 import { AppError } from "./errorHandler.middleware";
@@ -45,25 +44,25 @@ export const authMiddleware = async (
       { lastActiveTime: new Date() }
     );
 
-    if (proURL.includes(req.url)) {
-      if (decoded.userRole !== UserRoleEnum.pro) {
-        next(
-          new AppError(
-            HTTPStatusCode.Unauthorized,
-            "your not to pro url unauthorized"
-          )
-        );
-      }
-    } else if (normalURL.includes(req.url)) {
-      if (decoded.userRole === UserRoleEnum.free) {
-        next(
-          new AppError(
-            HTTPStatusCode.Unauthorized,
-            "your not to normal unauthorized"
-          )
-        );
-      }
-    }
+    // if (proURL.includes(req.url)) {
+    //   if (decoded.userRole !== UserRoleEnum.pro) {
+    //     next(
+    //       new AppError(
+    //         HTTPStatusCode.Unauthorized,
+    //         "your not to pro url unauthorized"
+    //       )
+    //     );
+    //   }
+    // } else if (normalURL.includes(req.url)) {
+    //   if (decoded.userRole === UserRoleEnum.free) {
+    //     next(
+    //       new AppError(
+    //         HTTPStatusCode.Unauthorized,
+    //         "your not to normal unauthorized"
+    //       )
+    //     );
+    //   }
+    // }
 
     req.user = decoded;
 

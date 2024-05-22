@@ -4,6 +4,7 @@ import session from "express-session";
 import passport from "passport";
 import { connectDatabase } from "./db/dbConnection";
 import { apiLogMiddleware } from "./middleware/apiLog.middleware";
+import { checkApiKey } from "./middleware/checkApiKey.middleware";
 import { errorHandler } from "./middleware/errorHandler.middleware";
 import "./middleware/googleAuth.middleware";
 import RootRouter from "./routes/rootRouter.routes";
@@ -26,6 +27,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Apply the middleware globally (all routes are protected)
+app.use(checkApiKey);
+
 app.use(apiLogMiddleware);
 
 app.use("/api/v1", RootRouter);
