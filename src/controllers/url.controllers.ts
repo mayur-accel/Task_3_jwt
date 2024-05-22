@@ -55,7 +55,6 @@ export const getByIdURLController = async (req: Request, res: Response) => {
 };
 
 export const urlRedirectController = async (req: Request, res: Response) => {
-  console.log(req.params.urlId);
   const urlData = await URL.findOne({ title: req.params.urlId });
   if (!urlData) {
     return res.json({
