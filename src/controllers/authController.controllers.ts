@@ -18,22 +18,23 @@ export const authLoginController = async (req: Request, res: Response) => {
     );
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
-
   const userData = await User.findOne({ email: email });
 
   if (!userData || !bcrypt.compareSync(password, userData.password)) {
     throw new AppError(HTTPStatusCode.Unauthorized, "Invalid credentials");
   }
 
-  const passUserData = {
+  const passUserData: any = {
     id: userData._id,
     firstName: userData.firstName,
     lastName: userData.lastName,
     email: userData.email,
     userRole: userData.userRole || UserRoleEnum.free,
   };
+
+  if (req.body.isAdmin === true) {
+    passUserData.permission = userData.permission;
+  }
 
   const jwtToken = await generateJWTToken(passUserData);
 

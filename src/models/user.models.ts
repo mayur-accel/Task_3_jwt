@@ -30,6 +30,18 @@ const userSchema = new Schema(
       default: UserRoleEnum.free,
       required: true,
     },
+    permission: [
+      {
+        permission_key: {
+          type: String,
+          required: true,
+        },
+        permission_value: {
+          type: [Number],
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
