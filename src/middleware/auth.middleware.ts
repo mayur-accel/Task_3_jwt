@@ -47,7 +47,6 @@ export const authMiddleware = async (
 
     if (decoded.permission) {
       const adminResult: any = await User.findOne({ _id: decoded.id });
-      console.log(adminResult);
 
       if (!adminResult) {
         throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
