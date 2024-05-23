@@ -47,26 +47,26 @@ const handleUserAuthRole = (
   }
 };
 
-const UserRouters = Router();
+const UserRoutes = Router();
 
-UserRouters.get("/active-device", asyncWrapper(getActiveUserController));
+UserRoutes.get("/active-device", asyncWrapper(getActiveUserController));
 
-UserRouters.get("/check-user-role", asyncWrapper(getCheckUserRoleController));
+UserRoutes.get("/check-user-role", asyncWrapper(getCheckUserRoleController));
 
-UserRouters.get("/check-user-role-free", asyncWrapper(getUserFreeURlControler));
-UserRouters.get(
+UserRoutes.get("/check-user-role-free", asyncWrapper(getUserFreeURlControler));
+UserRoutes.get(
   "/check-user-role-normal",
   (req, res, next) => handleUserAuthRole(req, res, next, UserRoleEnum.normal),
   asyncWrapper(getUserNormalURlControler)
 );
-UserRouters.get(
+UserRoutes.get(
   "/check-user-role-pro",
   (req, res, next) => handleUserAuthRole(req, res, next, UserRoleEnum.pro),
   asyncWrapper(getUserProURlControler)
 );
 
-UserRouters.get("/", asyncWrapper(getAllUserController));
+UserRoutes.get("/", asyncWrapper(getAllUserController));
 
-UserRouters.get("/:userId", asyncWrapper(getUserProfileController));
+UserRoutes.get("/:userId", asyncWrapper(getUserProfileController));
 
-export default UserRouters;
+export default UserRoutes;

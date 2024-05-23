@@ -10,26 +10,26 @@ import {
 import { authMiddleware } from "../../middleware/auth.middleware";
 import { asyncWrapper } from "../../utils/asyncWrapper";
 
-const AuthRouter = Router();
+const AuthRoutes = Router();
 
-AuthRouter.post("/login", asyncWrapper(authLoginController));
+AuthRoutes.post("/login", asyncWrapper(authLoginController));
 
-AuthRouter.post("/register", asyncWrapper(authRegisterController));
+AuthRoutes.post("/register", asyncWrapper(authRegisterController));
 
-AuthRouter.post("/set-password", asyncWrapper(authSetPasswordController));
+AuthRoutes.post("/set-password", asyncWrapper(authSetPasswordController));
 
-AuthRouter.post(
+AuthRoutes.post(
   "/reset-password",
   asyncWrapper(authMiddleware),
   asyncWrapper(authResetPasswordController)
 );
 
-AuthRouter.post("/forgot-password", asyncWrapper(authForgotPasswordController));
+AuthRoutes.post("/forgot-password", asyncWrapper(authForgotPasswordController));
 
-AuthRouter.post(
+AuthRoutes.post(
   "/logout",
   asyncWrapper(authMiddleware),
   asyncWrapper(authLogoutController)
 );
 
-export default AuthRouter;
+export default AuthRoutes;

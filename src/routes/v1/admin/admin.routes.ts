@@ -5,9 +5,9 @@ import { AppError } from "../../../middleware/errorHandler.middleware";
 import AdminUserRoute from "./adminUser.routes";
 import SubAdminRoutes from "./subAdmin.routes";
 
-const AdminRoute = Router();
+const AdminRoutes = Router();
 
-AdminRoute.use(
+AdminRoutes.use(
   "/subadmin",
   (req, res, next) => {
     const user: any = req.user;
@@ -21,7 +21,7 @@ AdminRoute.use(
   SubAdminRoutes
 );
 
-AdminRoute.use(
+AdminRoutes.use(
   "/user",
   (req, res, next) => {
     const user: any = req.user;
@@ -40,4 +40,4 @@ AdminRoute.use(
   AdminUserRoute
 );
 
-export default AdminRoute;
+export default AdminRoutes;

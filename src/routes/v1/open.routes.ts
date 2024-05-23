@@ -2,8 +2,8 @@ import { Router } from "express";
 import { getOpenController } from "../../controllers/openController.controllers";
 import { asyncWrapper } from "../../utils/asyncWrapper";
 
-const OpenRouter = Router();
+const OpenRoutes = Router();
 
-OpenRouter.get("/", asyncWrapper(getOpenController));
+OpenRoutes.get("/", asyncWrapper(getOpenController));
 
-export default OpenRouter;
+export default OpenRoutes;
