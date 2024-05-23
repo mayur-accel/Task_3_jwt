@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { UserLogs } from "../models/history.model";
+import User from "../models/user.models";
 import { AppError } from "./errorHandler.middleware";
 
 export const authMiddleware = async (
@@ -43,6 +44,21 @@ export const authMiddleware = async (
       { _id: result[0]._id },
       { lastActiveTime: new Date() }
     );
+
+    if (decoded.permission) {
+      const adminResult: any = await User.findOne({ _id: decoded.id });
+      console.log(adminResult);
+
+      if (!adminResult) {
+        throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
+      }
+      if (
+        JSON.stringify(adminResult.permission) !==
+        JSON.stringify(decoded.permission)
+      ) {
+        throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
+      }
+    }
 
     req.user = decoded;
 
