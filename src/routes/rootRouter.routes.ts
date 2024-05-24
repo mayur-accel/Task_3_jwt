@@ -6,6 +6,7 @@ import AuthRoutes from "./v1/auth.routes";
 import OpenRoutes from "./v1/open.routes";
 import URLRoutes from "./v1/url.routes";
 import UserRoutes from "./v1/user.routes";
+import UserActivityRoutes from "./v1/userActivity.routes";
 
 const RootRouter = Router();
 
@@ -17,5 +18,10 @@ RootRouter.use("/url", URLRoutes);
 // Protected routes
 RootRouter.use("/user", asyncWrapper(authMiddleware), UserRoutes);
 RootRouter.use("/admin", asyncWrapper(authMiddleware), AdminRoutes);
+RootRouter.use(
+  "/user-activity",
+  asyncWrapper(authMiddleware),
+  UserActivityRoutes
+);
 
 export default RootRouter;

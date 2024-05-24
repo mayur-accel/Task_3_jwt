@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { UserActivity } from "../models/log.model";
 
 export const colors = {
   Reset: "\x1b[0m",
@@ -33,7 +34,7 @@ export const apiLogMiddleware = (
 ) => {
   const start = Date.now();
 
-  res.on("finish", () => {
+  res.on("finish", async () => {
     const duration = Date.now() - start;
     let statusCodeColor = colors.FgGreen; // default color for success
     if (res.statusCode >= 400) {
@@ -41,13 +42,33 @@ export const apiLogMiddleware = (
     } else if (res.statusCode >= 300) {
       statusCodeColor = colors.FgYellow; // yellow for redirect status codes
     }
+
     console.log(
       `${colors.FgCyan}${new Date().toISOString()}${colors.Reset} - ${
         colors.FgBlue
       }${req.method}${colors.Reset} ${req.path} ${statusCodeColor}${
         res.statusCode
-      }${colors.Reset} ${duration}ms - ${colors.FgWhite}${colors.Reset}`
+      }${colors.Reset} ${duration}ms`
     );
+
+    if (req.user) {
+      const user: any = req.user;
+      const userData = new UserActivity({
+        method: req.method,
+        route: req.baseUrl + req.url,
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage,
+        responseTime: `${duration}ms`,
+        userId: user.id,
+        params:
+          Object.keys(req.params).length > 0 ? JSON.stringify(req.params) : "",
+        query:
+          Object.keys(req.query).length > 0 ? JSON.stringify(req.query) : "",
+        body: Object.keys(req.body).length > 0 ? JSON.stringify(req.body) : "",
+        jwtToken: JSON.stringify(req.headers.authorization),
+      });
+      userData.save();
+    }
   });
   next();
 };
