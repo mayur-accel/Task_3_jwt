@@ -8,7 +8,7 @@ export enum UserRoleEnum {
   rootAdmin = 4,
 }
 
-export enum UserPermissionEnum {
+export enum PermissionEnum {
   create = 0,
   read = 1,
   update = 2,

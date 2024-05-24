@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { asyncWrapper } from "../utils/asyncWrapper";
-import AdminRoutes from "./v1/admin/admin.routes";
+import AdminRoutes from "./v1/admin/root.routes";
 import AuthRoutes from "./v1/auth.routes";
 import OpenRoutes from "./v1/open.routes";
 import URLRoutes from "./v1/url.routes";

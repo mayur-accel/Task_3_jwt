@@ -6,20 +6,29 @@ const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      required: [true, "First name is required"],
+      trim: true,
+      minlength: [2, "First name must be at least 2 characters long"],
     },
     lastName: {
       type: String,
-      required: true,
+      required: [true, "Last name is required"],
+      trim: true,
+      minlength: [2, "Last name must be at least 2 characters long"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
+      trim: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, "Please use a valid email address"],
+      index: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
+      minlength: [8, "Password must be at least 8 characters long"],
     },
     googleId: {
       type: String,
@@ -29,6 +38,10 @@ const userSchema = new Schema(
       type: Number,
       default: UserRoleEnum.free,
       required: true,
+    },
+    adminRoleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Adminrole",
     },
     permission: [
       {
@@ -48,15 +61,17 @@ const userSchema = new Schema(
   }
 );
 
-// Hash password before saving the user model
+// Pre-save middleware to hash password if it's modified
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
+  if (!this.isModified("password")) return next();
+  try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err: any) {
+    next(err);
   }
-  next();
 });
-
 userSchema.pre("findOneAndUpdate", async function (next) {
   const update: any = this.getUpdate();
 
