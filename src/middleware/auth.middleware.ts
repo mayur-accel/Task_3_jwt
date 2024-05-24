@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { config } from "../config/config";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { UserLogs } from "../models/history.model";
 import User from "../models/user.models";
@@ -21,7 +22,7 @@ export const authMiddleware = async (
     }
 
     const token = authHeader.split(" ")[1];
-    const secretKey = process.env.SECRET_KEY || "";
+    const secretKey = config.get("secretKey");
 
     if (!secretKey) {
       throw new AppError(500, "Internal server error");

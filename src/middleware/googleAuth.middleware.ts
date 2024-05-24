@@ -5,11 +5,12 @@ import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from "passport-google-oauth2";
+import { config } from "../config/config";
 import User from "../models/user.models";
 dotenv.config();
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
+const GOOGLE_CLIENT_ID = config.get("googleClientId");
+const GOOGLE_CLIENT_SECRET = config.get("googleClientSecret");
 
 passport.use(
   new GoogleStrategy(

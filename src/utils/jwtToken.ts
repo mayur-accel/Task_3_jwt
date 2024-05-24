@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { config } from "../config/config";
 import { JWTexpiresIn } from "../constant/constant";
 
 interface Payload {
@@ -7,7 +8,7 @@ interface Payload {
 
 export const generateJWTToken = async (payload: Payload) => {
   try {
-    const secretKey = process.env.SECRET_KEY || "";
+    const secretKey = config.get("secretKey");
     if (!secretKey) {
       console.error("Secret key not defined");
     }

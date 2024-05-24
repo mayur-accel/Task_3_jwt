@@ -1,9 +1,7 @@
-import dotenv from "dotenv";
 import { NextFunction, Request, Response } from "express";
+import { config } from "../config/config";
 
-dotenv.config();
-
-const keys = process.env.API_KEYS || "";
+const keys = config.get("apiKey");
 
 // Get the API keys from the environment variable and convert them to a set
 const validApiKeys = new Set(keys.split(","));

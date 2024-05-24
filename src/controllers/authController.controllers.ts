@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { config } from "../config/config";
 import { UserRoleEnum } from "../constant/constant";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { AppError } from "../middleware/errorHandler.middleware";
@@ -83,7 +84,8 @@ export const authSetPasswordController = async (
 ) => {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.split(" ")[1];
-  const secretKey = process.env.SECRET_KEY || "";
+  const secretKey = config.get("secretKey");
+
   const email = req.query.email;
 
   if (!email) {
@@ -223,7 +225,7 @@ export const authForgotPasswordController = async (
     email: userData.email,
   };
 
-  const secretKey = process.env.SECRET_KEY || "";
+  const secretKey = config.get("secretKey");
   if (!secretKey) {
     console.error("Secret key not defined");
     throw new AppError(

@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import session from "express-session";
 import passport from "passport";
+import { config } from "./config/config";
 import { connectDatabase } from "./db/dbConnection";
 import { apiLogMiddleware } from "./middleware/apiLog.middleware";
 import { errorHandler } from "./middleware/errorHandler.middleware";
@@ -55,6 +56,6 @@ app.get("/auth/logout", async (req: Request, res: Response) => {
 // Register the error handler middleware
 app.use(errorHandler);
 
-app.listen(process.env.SERVER_PORT, () => {
-  console.log("Server start on port", process.env.SERVER_PORT);
+app.listen(config.get("serverPort"), () => {
+  console.log("Server start on port", config.get("serverPort"));
 });

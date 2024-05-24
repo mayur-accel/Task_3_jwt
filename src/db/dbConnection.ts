@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import { config } from "../config/config";
 import { colors } from "../middleware/apiLog.middleware";
 
-const dbURI = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/test_jwt";
+const dbURI = config.get("dbURI");
 
 export const connectDatabase = async () => {
   try {
