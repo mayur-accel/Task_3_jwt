@@ -1,3 +1,4 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import session from "express-session";
@@ -14,6 +15,7 @@ const app = express();
 
 connectDatabase();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 app.use(
