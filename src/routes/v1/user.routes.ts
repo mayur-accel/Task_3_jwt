@@ -9,6 +9,7 @@ import {
   getUserNormalURlControler,
   getUserProURlControler,
   getUserProfileController,
+  updateUserController,
 } from "../../controllers/userControllers.controllers";
 import { AppError } from "../../middleware/errorHandler.middleware";
 import { asyncWrapper } from "../../utils/asyncWrapper";
@@ -68,5 +69,7 @@ UserRoutes.get(
 UserRoutes.get("/", asyncWrapper(getAllUserController));
 
 UserRoutes.get("/:userId", asyncWrapper(getUserProfileController));
+
+UserRoutes.patch("/:userId", asyncWrapper(updateUserController));
 
 export default UserRoutes;

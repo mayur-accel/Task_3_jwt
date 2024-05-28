@@ -89,3 +89,24 @@ export const getUserProURlControler = async (req: Request, res: Response) => {
     message: "User role is Pro",
   });
 };
+
+export const updateUserController = async (req: Request, res: Response) => {
+  if (!req.body) {
+    throw new AppError(HTTPStatusCode.NotFound, "Request body not found");
+  }
+
+  const data = await User.findOneAndUpdate(
+    { _id: req.params.userId },
+    req.body
+  );
+
+  if (!data) {
+    throw new AppError(HTTPStatusCode.NotFound, "User not found");
+  }
+
+  return res.status(HTTPStatusCode.Ok).json({
+    status: HTTPStatusCode.Ok,
+    message: "user profile get sucessfull",
+    data,
+  });
+};
