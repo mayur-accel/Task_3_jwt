@@ -16,7 +16,7 @@ export const authMiddleware = async (
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       throw new AppError(
-        HTTPStatusCode.BadRequest,
+        HTTPStatusCode.Unauthorized,
         "Token is missing or malformed"
       );
     }

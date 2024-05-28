@@ -192,6 +192,22 @@ export const authResetPasswordController = async (
     }
   );
 
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.split(" ")[1];
+  const user: any = req.user;
+
+  await UserLogs.findOneAndUpdate(
+    {
+      userId: user.id,
+      token: token,
+    },
+    {
+      lastActiveTime: new Date(),
+      logoutTime: new Date(),
+      isActive: false,
+    }
+  );
+
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
     message: "User password sucessfull reset",
