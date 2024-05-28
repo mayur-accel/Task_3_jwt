@@ -1,6 +1,6 @@
 import cors from "cors";
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express from "express";
 import session from "express-session";
 import passport from "passport";
 import { config } from "./config/config";
@@ -48,12 +48,6 @@ app.get(
     failureRedirect: "/auth/google/failure",
   })
 );
-
-app.get("/auth/logout", async (req: Request, res: Response) => {
-  req.logout((err) => {
-    if (err) console.log(err);
-  });
-});
 
 // Register the error handler middleware
 app.use(errorHandler);

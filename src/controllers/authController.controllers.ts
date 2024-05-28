@@ -82,27 +82,8 @@ export const authSetPasswordController = async (
   req: Request,
   res: Response
 ) => {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.split(" ")[1];
+  const token = req.body.resetToken;
   const secretKey = config.get("secretKey");
-
-  const email = req.query.email;
-
-  if (!email) {
-    return res.status(HTTPStatusCode.BadRequest).json({
-      status: HTTPStatusCode.BadRequest,
-      message: "Email is required",
-    });
-  }
-
-  // Verify the token
-  const decoded = jwt.verify(token, secretKey) as JwtPayload;
-  if (decoded.email !== email) {
-    return res.status(HTTPStatusCode.BadRequest).json({
-      status: HTTPStatusCode.BadRequest,
-      message: "Token is invaid",
-    });
-  }
 
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
@@ -118,6 +99,16 @@ export const authSetPasswordController = async (
     return res.status(HTTPStatusCode.BadRequest).json({
       status: HTTPStatusCode.BadRequest,
       message: "Password and confirmPassword field are not same",
+    });
+  }
+
+  // Verify the token
+  const decoded = jwt.verify(token, secretKey) as JwtPayload;
+
+  if (!decoded) {
+    return res.status(HTTPStatusCode.BadRequest).json({
+      status: HTTPStatusCode.BadRequest,
+      message: "Reset token is not valid",
     });
   }
 
@@ -227,20 +218,19 @@ export const authForgotPasswordController = async (
   }
 
   const userData = await User.findOne({ email: email });
-
   if (!userData) {
     return res.status(HTTPStatusCode.BadRequest).json({
       status: HTTPStatusCode.BadRequest,
       message: "User with this email does not exist",
     });
   }
+
   const passUserData = {
     id: userData._id,
     firstName: userData.firstName,
     lastName: userData.lastName,
     email: userData.email,
   };
-
   const secretKey = config.get("secretKey");
   if (!secretKey) {
     console.error("Secret key not defined");
@@ -249,8 +239,8 @@ export const authForgotPasswordController = async (
       "Internal server error"
     );
   }
-  const token = jwt.sign(passUserData, secretKey, { expiresIn: "15m" });
 
+  const token = jwt.sign(passUserData, secretKey, { expiresIn: "15m" });
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
     message: "Password reset link has been sent to your email",
@@ -282,6 +272,10 @@ export const authLogoutController = async (req: Request, res: Response) => {
       isActive: false,
     }
   );
+
+  req.logout((err) => {
+    if (err) console.log(err);
+  });
 
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
