@@ -8,7 +8,7 @@ const REDIRECT_URI = "http://localhost:3000/auth/google/callback";
 const client = new OAuth2Client(CLIENT_ID);
 
 const googleLoginController = async (req: Request, res: Response) => {
-  const { email, password, idToken } = req.body;
+  const { email, idToken } = req.body;
   let user: any;
   try {
     // Check if it's a Google login

@@ -273,6 +273,7 @@ export const authLogoutController = async (req: Request, res: Response) => {
     }
   );
 
+  //  google logout function
   req.logout((err) => {
     if (err) console.log(err);
   });
@@ -280,5 +281,69 @@ export const authLogoutController = async (req: Request, res: Response) => {
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
     message: "User logout sucessfull",
+  });
+};
+
+export const googleLoginController = async (req: Request, res: Response) => {
+  const body = req.body;
+
+  if (!body) {
+    throw new AppError(HTTPStatusCode.BadRequest, "Request is empty");
+  }
+
+  const userData: any = await User.findOne({ email: body.email });
+
+  let passUserData: any;
+  if (!userData) {
+    const saveData = {
+      firstName: body.family_name,
+      lastName: body.given_name,
+      email: body.email,
+      profileImage: body.picture,
+      googleId: body.sub,
+      userRole: UserRoleEnum.free,
+    };
+    const userSaveData = new User(saveData);
+    const result = await userSaveData.save();
+    console.log("d nre user", result);
+
+    passUserData = {
+      id: result._id,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      email: result.email,
+      userRole: result.userRole || UserRoleEnum.free,
+    };
+  } else {
+    passUserData = {
+      id: userData._id,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      userRole: userData.userRole || UserRoleEnum.free,
+    };
+  }
+
+  const jwtToken = await generateJWTToken(passUserData);
+
+  const currentTime = new Date();
+  const data = new UserLogs({
+    userId: passUserData.id,
+    isActive: true,
+    lastActiveTime: currentTime,
+    loginTime: currentTime,
+    logoutTime: "",
+    token: jwtToken,
+  });
+
+  data.save();
+
+  return res.status(HTTPStatusCode.Ok).json({
+    status: HTTPStatusCode.Ok,
+    message: "User login successful",
+    data: {
+      ...passUserData,
+      token: jwtToken,
+    },
   });
 };

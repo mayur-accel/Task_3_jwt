@@ -6,6 +6,7 @@ import {
   authRegisterController,
   authResetPasswordController,
   authSetPasswordController,
+  googleLoginController,
 } from "../../controllers/authController.controllers";
 import { authMiddleware } from "../../middleware/auth.middleware";
 import { asyncWrapper } from "../../utils/asyncWrapper";
@@ -13,6 +14,8 @@ import { asyncWrapper } from "../../utils/asyncWrapper";
 const AuthRoutes = Router();
 
 AuthRoutes.post("/login", asyncWrapper(authLoginController));
+
+AuthRoutes.post("/google/login", asyncWrapper(googleLoginController));
 
 AuthRoutes.post("/register", asyncWrapper(authRegisterController));
 
