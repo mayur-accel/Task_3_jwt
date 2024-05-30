@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
+import multer from "multer";
+import path from "path";
 import { UserRoleEnum } from "../../constant/constant";
 import { HTTPStatusCode } from "../../constant/httpStatusCode";
 import {
@@ -13,6 +15,19 @@ import {
 } from "../../controllers/userControllers.controllers";
 import { AppError } from "../../middleware/errorHandler.middleware";
 import { asyncWrapper } from "../../utils/asyncWrapper";
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/temp/upload");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + ext);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const handleUserAuthRole = (
   req: Request,
@@ -70,6 +85,10 @@ UserRoutes.get("/", asyncWrapper(getAllUserController));
 
 UserRoutes.get("/:userId", asyncWrapper(getUserProfileController));
 
-UserRoutes.patch("/:userId", asyncWrapper(updateUserController));
+UserRoutes.patch(
+  "/:userId",
+  upload.single("profileImage"),
+  asyncWrapper(updateUserController)
+);
 
 export default UserRoutes;

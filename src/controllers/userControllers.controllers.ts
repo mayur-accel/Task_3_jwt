@@ -91,14 +91,26 @@ export const getUserProURlControler = async (req: Request, res: Response) => {
 };
 
 export const updateUserController = async (req: Request, res: Response) => {
-  if (!req.body) {
+  if (Object.keys(req.body).length === 0) {
     throw new AppError(HTTPStatusCode.NotFound, "Request body not found");
   }
 
-  const data = await User.findOneAndUpdate(
-    { _id: req.params.userId },
-    req.body
-  );
+  const userData = await User.findById(req.params.userId);
+  if (!userData) {
+    throw new AppError(HTTPStatusCode.NotFound, "User not found");
+  }
+
+  console.log("file", req.file);
+  console.log("body", req.body);
+
+  const body: any = req.body;
+
+  if (req.file) {
+    body.profileImage = String(req.file.path).replace("public\\", "");
+  }
+  const data = await User.findOneAndUpdate({ _id: req.params.userId }, body, {
+    new: true,
+  });
 
   if (!data) {
     throw new AppError(HTTPStatusCode.NotFound, "User not found");

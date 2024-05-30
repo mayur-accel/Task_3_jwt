@@ -34,7 +34,7 @@ export const authMiddleware = async (
     const result = await UserLogs.find({ userId: decoded.id, token: token });
 
     if (result.length !== 1 || !result[0]?.isActive) {
-      throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
+      throw new AppError(HTTPStatusCode.Unauthorized, "Token is invalid");
     }
     // You can add additional checks on the decoded payload if needed
     // For example, checking user roles or permissions
@@ -50,13 +50,13 @@ export const authMiddleware = async (
       const adminResult: any = await User.findOne({ _id: decoded.id });
 
       if (!adminResult) {
-        throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
+        throw new AppError(HTTPStatusCode.Unauthorized, "Token is invalid");
       }
       if (
         JSON.stringify(adminResult.permission) !==
         JSON.stringify(decoded.permission)
       ) {
-        throw new AppError(HTTPStatusCode.BadRequest, "Token is invalid");
+        throw new AppError(HTTPStatusCode.Unauthorized, "Token is invalid");
       }
     }
 

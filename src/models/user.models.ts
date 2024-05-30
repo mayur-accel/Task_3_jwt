@@ -38,6 +38,10 @@ const userSchema = new Schema(
       default: UserRoleEnum.free,
       required: true,
     },
+    profileImage: {
+      type: String,
+      default: "",
+    },
     adminRoleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Adminrole",
