@@ -33,6 +33,14 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    githubId: {
+      type: String,
+      default: "",
+    },
+    twitterId: {
+      type: String,
+      default: "",
+    },
     userRole: {
       type: Number,
       default: UserRoleEnum.free,

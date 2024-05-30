@@ -15,7 +15,7 @@ const AuthRoutes = Router();
 
 AuthRoutes.post("/login", asyncWrapper(authLoginController));
 
-AuthRoutes.post("/google/login", asyncWrapper(googleLoginController));
+AuthRoutes.post("/social/login", asyncWrapper(googleLoginController));
 
 AuthRoutes.post("/register", asyncWrapper(authRegisterController));
 

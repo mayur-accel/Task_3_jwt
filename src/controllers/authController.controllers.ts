@@ -8,6 +8,7 @@ import { AppError } from "../middleware/errorHandler.middleware";
 import { UserLogs } from "../models/history.model";
 import User from "../models/user.models";
 import { generateJWTToken } from "../utils/jwtToken";
+import userRegisterSchema from "../validators/userValidator";
 
 export const authLoginController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -62,6 +63,12 @@ export const authLoginController = async (req: Request, res: Response) => {
 };
 
 export const authRegisterController = async (req: Request, res: Response) => {
+  const { error } = userRegisterSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   let userData: any = await User.findOne({ email: req.body.email });
   if (userData) {
     throw new AppError(HTTPStatusCode.BadRequest, "Email is aleady register");
@@ -284,6 +291,20 @@ export const authLogoutController = async (req: Request, res: Response) => {
   });
 };
 
+const logUserActivity = async (userId: string, jwtToken: string) => {
+  const currentTime = new Date();
+  const data = new UserLogs({
+    userId,
+    isActive: true,
+    lastActiveTime: currentTime,
+    loginTime: currentTime,
+    logoutTime: "",
+    token: jwtToken,
+  });
+
+  await data.save();
+};
+
 export const googleLoginController = async (req: Request, res: Response) => {
   const body = req.body;
 
@@ -295,48 +316,45 @@ export const googleLoginController = async (req: Request, res: Response) => {
 
   let passUserData: any;
   if (!userData) {
-    const saveData = {
-      firstName: body.family_name,
-      lastName: body.given_name,
-      email: body.email,
-      profileImage: body.picture,
-      googleId: body.sub,
-      userRole: UserRoleEnum.free,
-    };
-    const userSaveData = new User(saveData);
+    const userSaveData = new User(body);
     const result = await userSaveData.save();
-    console.log("d nre user", result);
-
     passUserData = {
       id: result._id,
       firstName: result.firstName,
       lastName: result.lastName,
       email: result.email,
-      userRole: result.userRole || UserRoleEnum.free,
+      userRole: result.userRole,
     };
   } else {
+    const updateData: any = {};
+
+    if (body.googleId && !userData.googleId) {
+      updateData.googleId = body.googleId;
+    }
+
+    if (body.githubId && !userData.githubId) {
+      updateData.githubId = body.githubId;
+    }
+    if (body.twitterId && !userData.twitterId) {
+      updateData.twitterId = body.twitterId;
+    }
+
+    if (Object.keys(updateData).length !== 0) {
+      await User.findOneAndUpdate({ email: body.email }, updateData);
+    }
+
     passUserData = {
       id: userData._id,
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
-      userRole: userData.userRole || UserRoleEnum.free,
+      userRole: userData.userRole,
     };
   }
 
-  const jwtToken = await generateJWTToken(passUserData);
+  const jwtToken: any = await generateJWTToken(passUserData);
 
-  const currentTime = new Date();
-  const data = new UserLogs({
-    userId: passUserData.id,
-    isActive: true,
-    lastActiveTime: currentTime,
-    loginTime: currentTime,
-    logoutTime: "",
-    token: jwtToken,
-  });
-
-  data.save();
+  logUserActivity(passUserData.id, jwtToken);
 
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,

@@ -85,16 +85,16 @@ export const updateURLController = async (req: Request, res: Response) => {
 };
 
 export const deleteURLController = async (req: Request, res: Response) => {
-  const deleteURl = await URL.findByIdAndDelete({ _id: req.params.urlId });
-  if (!deleteURl) {
+  const deleteURL = await URL.findByIdAndDelete({ _id: req.params.urlId });
+  if (!deleteURL) {
     return res.json({
       status: 404,
-      message: "Url not found",
+      message: "URL not found",
     });
   }
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
-    message: "Url data deleted sucessfull",
-    data: deleteURl,
+    message: "URL data deleted successfully",
+    data: deleteURL,
   });
 };
