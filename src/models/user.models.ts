@@ -41,6 +41,10 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    facebookId: {
+      type: String,
+      default: "",
+    },
     userRole: {
       type: Number,
       default: UserRoleEnum.free,

@@ -338,6 +338,9 @@ export const googleLoginController = async (req: Request, res: Response) => {
     if (body.twitterId && !userData.twitterId) {
       updateData.twitterId = body.twitterId;
     }
+    if (body.facebookId && !userData.facebookId) {
+      updateData.facebookId = body.facebookId;
+    }
 
     if (Object.keys(updateData).length !== 0) {
       await User.findOneAndUpdate({ email: body.email }, updateData);
