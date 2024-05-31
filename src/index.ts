@@ -1,7 +1,9 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import mongoSanitize from "express-mongo-sanitize";
 import session from "express-session";
+import helmet from "helmet";
 import passport from "passport";
 import { config } from "./config/config";
 import { connectDatabase } from "./db/dbConnection";
@@ -15,9 +17,21 @@ const app = express();
 
 connectDatabase();
 
+// set security HTTP headers
+app.use(helmet());
+
+// enable cors
 app.use(cors());
+
+// parse json request body
 app.use(express.json());
+
+// parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
+
+// sanitize request data
+app.use(mongoSanitize());
+
 app.use(express.static("public"));
 app.use(
   session({
