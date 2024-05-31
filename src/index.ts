@@ -6,9 +6,10 @@ import session from "express-session";
 import helmet from "helmet";
 import passport from "passport";
 import { config } from "./config/config";
+import { HTTPStatusCode } from "./constant/httpStatusCode";
 import { connectDatabase } from "./db/dbConnection";
 import { apiLogMiddleware } from "./middleware/apiLog.middleware";
-import { errorHandler } from "./middleware/errorHandler.middleware";
+import { AppError, errorHandler } from "./middleware/errorHandler.middleware";
 import "./middleware/googleAuth.middleware";
 import RootRouter from "./routes/rootRouter.routes";
 
@@ -63,6 +64,12 @@ app.get(
     failureRedirect: "/auth/google/failure",
   })
 );
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  const err = new AppError(HTTPStatusCode.NotFound, "API not found");
+  return next(err);
+});
 
 // Register the error handler middleware
 app.use(errorHandler);
