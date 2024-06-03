@@ -4,9 +4,7 @@ import express from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import session from "express-session";
 import helmet from "helmet";
-import { createServer } from "http";
 import passport from "passport";
-import { Server } from "socket.io";
 import { config } from "./config/config";
 import { HTTPStatusCode } from "./constant/httpStatusCode";
 import { connectDatabase } from "./db/dbConnection";
@@ -17,29 +15,6 @@ import RootRouter from "./routes/rootRouter.routes";
 
 dotenv.config();
 const app = express();
-const server = createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log("User connection successfull");
-  console.log("User id:", socket.id);
-
-  socket.on("send-message", (message) => {
-    console.log(message);
-    io.emit("receive-message", message);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Use is disconnect", socket.id);
-  });
-});
 
 connectDatabase();
 
@@ -99,6 +74,6 @@ app.use((req, res, next) => {
 // Register the error handler middleware
 app.use(errorHandler);
 
-server.listen(config.get("serverPort"), () => {
+app.listen(config.get("serverPort"), () => {
   console.log("Server start on port", config.get("serverPort"));
 });

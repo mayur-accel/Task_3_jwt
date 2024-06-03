@@ -87,6 +87,7 @@ userSchema.pre("save", async function (next) {
     next(err);
   }
 });
+
 userSchema.pre("findOneAndUpdate", async function (next) {
   const update: any = this.getUpdate();
 
