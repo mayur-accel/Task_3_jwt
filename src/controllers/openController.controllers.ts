@@ -1,7 +1,10 @@
 import { faker } from "@faker-js/faker";
+import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
+import fs from "fs";
 import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
+import puppeteer from "puppeteer";
 import qrcode from "qrcode";
 import { UserRoleEnum } from "../constant/constant";
 import User from "../models/user.models";
@@ -155,12 +158,18 @@ export const sendMail = async (req: Request, res: Response) => {
 export const firstNameGenerate = async (req: Request, res: Response) => {
   // Create an array of 10,000 documents
   const data = [];
-  for (let i = 0; i < 10000; i++) {
+
+  const generatePassword = async (password: string) => {
+    const salt = await bcrypt.genSalt(10);
+    return await bcrypt.hash(password, salt);
+  };
+
+  for (let i = 0; i < 1000; i++) {
     data.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
       email: faker.internet.email(),
-      password: "password",
+      password: await generatePassword("password"),
       userRole: UserRoleEnum.free,
     });
   }
@@ -217,4 +226,37 @@ export const pdfGenerate = async (req: Request, res: Response) => {
 
   // Finalize the PDF and end the stream
   doc.end();
+};
+
+export const htmlToPDFGenerate = async (req: Request, res: Response) => {
+  const { name, amount, date } = req.body;
+
+  // Load the HTML template
+  const templatePath = "public/demo.html";
+  let html = fs.readFileSync(templatePath, "utf8");
+
+  // Insert dynamic values into the HTML template
+  html = html.replace("{{name}}", name);
+  html = html.replace("{{amount}}", amount);
+  html = html.replace("{{date}}", date);
+
+  // Launch Puppeteer and generate the PDF
+  // Create a browser instance
+  const browser = await puppeteer.launch();
+
+  // Create a new page
+  const page = await browser.newPage();
+
+  // Set the HTML content to the page
+  await page.setContent(html);
+
+  // Downlaod the PDF
+  const pdf = await page.pdf({ format: "A4" });
+
+  await browser.close();
+
+  // Send the generated PDF to the client
+  res.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
+  res.setHeader("Content-Type", "application/pdf");
+  res.send(pdf);
 };

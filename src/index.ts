@@ -7,6 +7,7 @@ import helmet from "helmet";
 import passport from "passport";
 import { config } from "./config/config";
 import { HTTPStatusCode } from "./constant/httpStatusCode";
+import "./cronJobs/task1";
 import { connectDatabase } from "./db/dbConnection";
 import { apiLogMiddleware } from "./middleware/apiLog.middleware";
 import { AppError, errorHandler } from "./middleware/errorHandler.middleware";

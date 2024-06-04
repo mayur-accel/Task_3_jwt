@@ -3,6 +3,7 @@ import {
   dateRangeFilter,
   firstNameGenerate,
   getOpenController,
+  htmlToPDFGenerate,
   multipleFilter,
   multipleSorting,
   pdfGenerate,
@@ -30,5 +31,7 @@ OpenRoutes.get("/send-mail", asyncWrapper(sendMail));
 OpenRoutes.get("/first-name", asyncWrapper(firstNameGenerate));
 
 OpenRoutes.get("/generate-pdf", asyncWrapper(pdfGenerate));
+
+OpenRoutes.get("/generate-html-pdf", asyncWrapper(htmlToPDFGenerate));
 
 export default OpenRoutes;
