@@ -5,6 +5,7 @@ import {
   getOpenController,
   multipleFilter,
   multipleSorting,
+  pdfGenerate,
   qrcodeGenarator,
   sendMail,
 } from "../../controllers/openController.controllers";
@@ -27,5 +28,7 @@ OpenRoutes.get("/multiple-sorting-filter", asyncWrapper(multipleSorting));
 OpenRoutes.get("/send-mail", asyncWrapper(sendMail));
 
 OpenRoutes.get("/first-name", asyncWrapper(firstNameGenerate));
+
+OpenRoutes.get("/generate-pdf", asyncWrapper(pdfGenerate));
 
 export default OpenRoutes;
