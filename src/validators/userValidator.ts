@@ -9,3 +9,11 @@ const userRegisterSchema = Joi.object({
 });
 
 export default userRegisterSchema;
+
+export const tagSchema = Joi.object({
+  name: Joi.string().alphanum().min(3).max(30).required(),
+});
+
+export const tagUpdateSchema = Joi.object({
+  name: Joi.string().alphanum().min(3).max(30).required(),
+});
