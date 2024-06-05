@@ -1,6 +1,18 @@
 import mongoose, { Schema } from "mongoose";
 
-const postSchema = new Schema(
+// Define the interface for the Post document
+interface IPost extends Document {
+  title: string;
+  description: string;
+  isActive: boolean;
+  isDelete: boolean;
+  tags: mongoose.Types.ObjectId[];
+  userId: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const postSchema = new Schema<IPost>(
   {
     title: {
       type: String,
@@ -36,4 +48,5 @@ const postSchema = new Schema(
   { timestamps: true }
 );
 
-export const Post = mongoose.model("Post", postSchema);
+// Create and export the Post model
+export const Post = mongoose.model<IPost>("Post", postSchema);

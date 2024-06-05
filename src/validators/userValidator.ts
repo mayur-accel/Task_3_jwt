@@ -17,3 +17,9 @@ export const tagSchema = Joi.object({
 export const tagUpdateSchema = Joi.object({
   name: Joi.string().alphanum().min(3).max(30).required(),
 });
+
+export const postCreateSchema = Joi.object({
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  tags: Joi.array().items(Joi.string()).required(),
+});

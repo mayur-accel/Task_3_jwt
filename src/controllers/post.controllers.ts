@@ -1,16 +1,42 @@
 import { Request, Response } from "express";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { Post } from "../models/post.model";
+import { Tag } from "../models/tag.model";
 import User from "../models/user.models";
+import { postCreateSchema } from "../validators/userValidator";
 
 export const createPostController = async (req: Request, res: Response) => {
-  const userData = await User.findById({ _id: req.body.userId });
+  const { error } = postCreateSchema.validate(req.body);
+  if (error)
+    return res.status(HTTPStatusCode.BadRequest).json({
+      status: HTTPStatusCode.BadRequest,
+      error: error.details[0].message,
+    });
+
+  // Find the user
+  const user: any = req.user;
+  const userData = await User.findById(user.id);
   if (!userData) {
-    return res.json({
-      message: "user nout found",
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
+      message: "User not found",
     });
   }
 
+  // Validate tags
+  const tagValidationPromises = req.body.tags.map((tagId: string) =>
+    Tag.findById(tagId)
+  );
+  const tagResults = await Promise.all(tagValidationPromises);
+  const invalidTags = tagResults.some((tag) => !tag);
+  if (invalidTags) {
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
+      message: "One or more tags are not found",
+    });
+  }
+
+  // Create the post
   const body = {
     title: req.body.title,
     description: req.body.description,
@@ -19,12 +45,11 @@ export const createPostController = async (req: Request, res: Response) => {
   };
 
   const postData = new Post(body);
-
   const result = await postData.save();
 
   return res.status(HTTPStatusCode.Created).json({
     status: HTTPStatusCode.Created,
-    message: "Post created sucessfull",
+    message: "Post created successfully",
     data: result,
   });
 };
