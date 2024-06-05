@@ -14,12 +14,13 @@ const PostRoutes = Router();
 // create Post
 PostRoutes.post("/", asyncWrapper(createPostController));
 
-// get all Post redirect
+// get all Post
 PostRoutes.get("/", asyncWrapper(getAllPostController));
 
+// get all User Post
 PostRoutes.get("/user", asyncWrapper(getAllUserPostController));
 
-// get by Post
+// get by Id Post
 PostRoutes.get("/:postId", asyncWrapper(getByIdPostController));
 
 // update Post

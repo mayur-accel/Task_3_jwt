@@ -82,14 +82,62 @@ export const getAllPostController = async (req: Request, res: Response) => {
 };
 
 export const getAllUserPostController = async (req: Request, res: Response) => {
-  const postData = await Post.find({ isDelete: false })
-    .populate("tags")
-    .populate("userId");
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 10);
+  const startIndex = (page - 1) * limit;
+
+  const results = await Post.aggregate([
+    { $match: { isDelete: false } },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "userId",
+        as: "user_details",
+      },
+    },
+    {
+      $lookup: {
+        from: "tags",
+        foreignField: "_id",
+        localField: "tags",
+        as: "tag",
+      },
+    },
+    { $skip: startIndex },
+    { $limit: limit },
+    {
+      $facet: {
+        posts: [
+          {
+            $project: {
+              _id: 1,
+              title: 1,
+              description: 1,
+              user_details: {
+                _id: 1,
+                email: 1,
+                firstName: 1,
+                lastName: 1,
+              },
+              tag: {
+                _id: 1,
+                name: 1,
+              },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  
+  const totalCount = await Post.countDocuments({ isDelete: false });
 
   return res.status(HTTPStatusCode.Created).json({
     status: HTTPStatusCode.Created,
     message: "Post data get sucessfull",
-    data: postData,
+    totalCount,
+    data: results[0].posts,
   });
 };
 
