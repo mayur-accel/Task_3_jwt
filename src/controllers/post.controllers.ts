@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import { HTTPStatusCode } from "../constant/httpStatusCode";
 import { Post } from "../models/post.model";
 import { Tag } from "../models/tag.model";
@@ -20,6 +21,19 @@ export const createPostController = async (req: Request, res: Response) => {
     return res.status(HTTPStatusCode.NotFound).json({
       status: HTTPStatusCode.NotFound,
       message: "User not found",
+    });
+  }
+
+  let tagIdValidation = false;
+  req.body.tags.map((tagId: string) => {
+    if (!mongoose.Types.ObjectId.isValid(tagId)) {
+      tagIdValidation = true;
+    }
+  });
+  if (tagIdValidation) {
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
+      message: "One or more tags please provide a id ",
     });
   }
 
@@ -55,7 +69,9 @@ export const createPostController = async (req: Request, res: Response) => {
 };
 
 export const getAllPostController = async (req: Request, res: Response) => {
-  const postData = await Post.find({ isDelete: false });
+  const postData = await Post.find({ isDelete: false })
+    .populate("tags")
+    .populate("userId");
 
   return res.status(HTTPStatusCode.Created).json({
     status: HTTPStatusCode.Created,
@@ -65,29 +81,55 @@ export const getAllPostController = async (req: Request, res: Response) => {
 };
 
 export const getByIdPostController = async (req: Request, res: Response) => {
-  const postData = await Post.findById({ _id: req.params.postId });
+  // Validate the postId parameter
+  const { postId } = req.params;
+  if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(HTTPStatusCode.BadRequest).json({
+      status: HTTPStatusCode.BadRequest,
+      message: "Invalid post ID",
+    });
+  }
+
+  // Find the post by ID
+  const postData = await Post.findById(postId)
+    .populate("tags")
+    .populate("userId");
+
   if (!postData) {
-    return res.json({
-      status: 404,
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
       message: "Post not found",
     });
   }
 
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
-    message: "Post data get sucessfull",
+    message: "Post data retrieved successfully",
     data: postData,
   });
 };
 
 export const updatePostController = async (req: Request, res: Response) => {
+  // Validate the postId parameter
+  const { postId } = req.params;
+  if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(HTTPStatusCode.BadRequest).json({
+      status: HTTPStatusCode.BadRequest,
+      message: "Invalid post ID",
+    });
+  }
+
   const postData = await Post.findOneAndUpdate(
     { _id: req.params.postId },
-    req.body
+    req.body,
+    {
+      new: true,
+    }
   );
+
   if (!postData) {
-    return res.json({
-      status: 404,
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
       message: "Post not found",
     });
   }
@@ -100,10 +142,27 @@ export const updatePostController = async (req: Request, res: Response) => {
 };
 
 export const deletePostController = async (req: Request, res: Response) => {
-  const deleteURL = await Post.findByIdAndDelete({ _id: req.params.postId });
-  if (!deleteURL) {
-    return res.json({
-      status: 404,
+  // Validate the postId parameter
+  const { postId } = req.params;
+  if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(HTTPStatusCode.BadRequest).json({
+      status: HTTPStatusCode.BadRequest,
+      message: "Invalid post ID",
+    });
+  }
+
+  const deletePost = await Post.findOneAndUpdate(
+    { _id: req.params.postId },
+    {
+      isDelete: true,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!deletePost) {
+    return res.status(HTTPStatusCode.NotFound).json({
+      status: HTTPStatusCode.NotFound,
       message: "Post not found",
     });
   }
@@ -111,6 +170,6 @@ export const deletePostController = async (req: Request, res: Response) => {
   return res.status(HTTPStatusCode.Ok).json({
     status: HTTPStatusCode.Ok,
     message: "Post data deleted successfully",
-    data: deleteURL,
+    data: deletePost,
   });
 };
