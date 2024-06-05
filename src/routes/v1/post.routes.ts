@@ -3,6 +3,7 @@ import {
   createPostController,
   deletePostController,
   getAllPostController,
+  getAllUserPostController,
   getByIdPostController,
   updatePostController,
 } from "../../controllers/post.controllers";
@@ -15,6 +16,8 @@ PostRoutes.post("/", asyncWrapper(createPostController));
 
 // get all Post redirect
 PostRoutes.get("/", asyncWrapper(getAllPostController));
+
+PostRoutes.get("/user", asyncWrapper(getAllUserPostController));
 
 // get by Post
 PostRoutes.get("/:postId", asyncWrapper(getByIdPostController));

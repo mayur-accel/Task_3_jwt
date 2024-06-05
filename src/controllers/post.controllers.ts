@@ -69,6 +69,19 @@ export const createPostController = async (req: Request, res: Response) => {
 };
 
 export const getAllPostController = async (req: Request, res: Response) => {
+  const user: any = req.user;
+  const postData = await Post.find({ isDelete: false, userId: user.id })
+    .populate("tags")
+    .populate("userId");
+
+  return res.status(HTTPStatusCode.Created).json({
+    status: HTTPStatusCode.Created,
+    message: "Post data get sucessfull",
+    data: postData,
+  });
+};
+
+export const getAllUserPostController = async (req: Request, res: Response) => {
   const postData = await Post.find({ isDelete: false })
     .populate("tags")
     .populate("userId");
