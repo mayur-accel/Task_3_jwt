@@ -23,3 +23,12 @@ export const postCreateSchema = Joi.object({
   description: Joi.string().required(),
   tags: Joi.array().items(Joi.string()).required(),
 });
+
+export const bookCreateSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+});
+
+export const bookUpdateSchema = Joi.object({
+  name: Joi.string().alphanum().min(3).max(30).required(),
+});
