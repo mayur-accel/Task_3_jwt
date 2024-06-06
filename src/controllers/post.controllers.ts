@@ -86,14 +86,34 @@ export const getAllUserPostController = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit || 10);
   const startIndex = (page - 1) * limit;
 
+  const filter: any = {
+    isDelete: false,
+    isActive: true,
+  };
+
+  if (req.query?.tags) {
+    filter.tags = {
+      $in: String(req.query.tags)
+        .split(",")
+        .map((tag: string) => new mongoose.Types.ObjectId(tag.trim())),
+    };
+  }
+  if (req.query?.title) {
+    filter.title = {
+      $regex: req.query?.title,
+      $options: "i",
+    };
+  }
+
+  if (req.query.user) {
+    filter.userId = new mongoose.Types.ObjectId(String(req.query.user || ""));
+  }
+
   const results = await Post.aggregate([
-    { $match: { isDelete: false } },
+    { $match: filter },
     {
-      $lookup: {
-        from: "users",
-        foreignField: "_id",
-        localField: "userId",
-        as: "user_details",
+      $sort: {
+        createdAt: 1,
       },
     },
     {
@@ -130,8 +150,8 @@ export const getAllUserPostController = async (req: Request, res: Response) => {
       },
     },
   ]);
-  
-  const totalCount = await Post.countDocuments({ isDelete: false });
+
+  const totalCount = await Post.countDocuments(filter);
 
   return res.status(HTTPStatusCode.Created).json({
     status: HTTPStatusCode.Created,
@@ -234,3 +254,9 @@ export const deletePostController = async (req: Request, res: Response) => {
     data: deletePost,
   });
 };
+
+
+
+
+
+
